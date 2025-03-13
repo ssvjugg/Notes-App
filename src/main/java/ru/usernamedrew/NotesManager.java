@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 enum Command {
-    Add, Edit, Delete, Get, Exit;
+    ADD, EDIT, DELETE, GET, EXIT;
 }
 
 @Slf4j
 public final class NotesManager {
-    private HashMap<Integer, Note> notes;
+    private final HashMap<Integer, Note> notes;
     private int id = 0;
     private static final String FILE_NAME = "notes.dat";
 
@@ -28,23 +28,25 @@ public final class NotesManager {
      */
     public void run() {
         Scanner scanner = new Scanner(System.in);
-        Command cmd;
+        Command cmd = null;
 
         do {
             System.out.print("Enter command (Add, Edit, Delete, Get, Exit): ");
-            cmd = Command.valueOf(scanner.nextLine().toUpperCase());
-            switch (cmd) {
-                case Add -> addNote(scanner);
-                case Edit -> editNote(scanner);
-                case Delete -> deleteNote(scanner);
-                case Get -> printNotes();
-                case Exit -> saveNotes();
-                default -> {
-                    System.out.println("Invalid command");
-                    log.warn("Invalid command");
+            String input = scanner.nextLine();
+            try {
+                cmd = Command.valueOf(input.toUpperCase());
+                switch (cmd) {
+                    case ADD -> addNote(scanner);
+                    case EDIT -> editNote(scanner);
+                    case DELETE -> deleteNote(scanner);
+                    case GET -> printNotes();
+                    case EXIT -> saveNotes();
                 }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid command. Please try again.");
+                log.warn("Invalid command: " + input);
             }
-        } while (cmd != Command.Exit);
+        } while (cmd != Command.EXIT);
     }
 
     /**
@@ -54,10 +56,11 @@ public final class NotesManager {
     private void addNote(Scanner scanner) {
         System.out.print("Enter the title of the note: ");
         String title = scanner.nextLine();
-        System.out.print("Enter the content of the note: ");
-        String content = scanner.nextLine();
-        notes.put(id++, new Note(title, content));
-        log.info("Note added: " + id--);
+        String content = readContent(scanner);
+        while (notes.containsKey(id)) id++; // Not so efficient(
+        notes.put(id, new Note(title, content));
+        log.info("Note added: " + id);
+        id++;
     }
 
     /**
@@ -78,10 +81,26 @@ public final class NotesManager {
     private void editNote(Scanner scanner) {
         System.out.print("Enter the number of the note: ");
         int noteNumber = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter the new content of the note: ");
-        String content = scanner.nextLine();
+        String content = readContent(scanner);
         notes.get(noteNumber).setContent(content);
         log.info("Note updated: " + noteNumber);
+    }
+
+    /**
+     * Auxiliary function for reading from a standard input stream, line by line
+     * @param scanner input stream
+     * @return String with text from standard input
+     */
+    private String readContent(Scanner scanner) {
+        System.out.println("Enter the content of the note (type 'END' on a new line to finish):");
+        StringBuilder contentBuilder = new StringBuilder();
+        String line;
+
+        while (!(line = scanner.nextLine()).equals("END")) {
+            contentBuilder.append(line).append("\n");
+        }
+
+        return contentBuilder.toString().trim();
     }
 
     /**
@@ -111,10 +130,16 @@ public final class NotesManager {
 
 
     private Note findNoteByTitle(String title) {
-        return null;
+        return notes.values().stream().filter(note -> note.getTitle().equals(title)).findFirst().orElse(null);
     }
 
-    private String printNotes() {
-        return null;
+    private void printNotes() {
+        StringBuilder sb = new StringBuilder();
+        for (var entry : notes.entrySet()) {
+            sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n\n");
+        }
+        if (sb.length() >= 2)
+            sb.setLength(sb.length() - 2);
+        System.out.println(sb.toString());
     }
 }
