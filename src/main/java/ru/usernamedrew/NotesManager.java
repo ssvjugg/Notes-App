@@ -1,5 +1,6 @@
 package ru.usernamedrew;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -11,6 +12,7 @@ enum Command {
 }
 
 @Slf4j
+@Getter
 public final class NotesManager {
     private final HashMap<Integer, Note> notes;
     private int id = 0;
@@ -53,7 +55,7 @@ public final class NotesManager {
      * Method that implements adding the note
      * @param scanner input stream
      */
-    private void addNote(Scanner scanner) {
+    public void addNote(Scanner scanner) {
         System.out.print("Enter the title of the note: ");
         String title = scanner.nextLine();
         String content = readContent(scanner);
@@ -67,7 +69,7 @@ public final class NotesManager {
      * Method that implements deleting the note
      * @param scanner input stream
      */
-    private void deleteNote(Scanner scanner) {
+    public void deleteNote(Scanner scanner) {
         System.out.print("Enter the number of the note: ");
         int noteNumber = Integer.parseInt(scanner.nextLine());
         notes.remove(noteNumber);
@@ -78,7 +80,7 @@ public final class NotesManager {
      * Method that implements editing the note
      * @param scanner input stream
      */
-    private void editNote(Scanner scanner) {
+    public void editNote(Scanner scanner) {
         System.out.print("Enter the number of the note: ");
         int noteNumber = Integer.parseInt(scanner.nextLine());
         String content = readContent(scanner);
