@@ -135,6 +135,10 @@ public final class NotesManager {
         return notes.values().stream().filter(note -> note.getTitle().equals(title)).findFirst().orElse(null);
     }
 
+    public void deleteAllNotes() {
+        notes.clear();
+    }
+
     private void printNotes() {
         StringBuilder sb = new StringBuilder();
         for (var entry : notes.entrySet()) {
