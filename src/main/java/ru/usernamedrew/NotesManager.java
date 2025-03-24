@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 enum Command {
-    ADD, EDIT, DELETE, GET, EXIT;
+    ADD, EDIT, DELETE, GET, EXIT
 }
 
 @Slf4j
